@@ -1,110 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Unit Circle Trig Quiz</title>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
   <style>
+    /* General page styling */
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f0f4f8;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background-color: #f8fbfd;
       margin: 0;
-      padding: 20px;
+      padding: 0;
     }
 
-    .quiz-card {
-      background: white;
-      padding: 30px 40px;
-      border-radius: 15px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      width: 400px;
-      max-width: 100%;
+    /* Header container */
+    .header {
+      position: sticky;
+      top: 0;
+      background-color: #ffffff;
+      /* white header */
+      padding: 16px 0;
       text-align: center;
+      border-bottom: 1px solid #ddd;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      z-index: 1000;
     }
 
-    h1 {
-      margin-bottom: 15px;
-      font-size: 28px;
+    /* Header title */
+    .header h1 {
+      font-size: 1.4rem;
+      margin: 0;
+      color: #333;
+      font-weight: 600;
+    }
+
+    /* Score text */
+    .header .score {
+      font-size: 1rem;
+      color: #666;
+      margin-top: 6px;
+    }
+
+    /* Progress bar wrapper */
+    .progress-bar {
+      width: 90%;
+      max-width: 500px;
+      margin: 12px auto 0;
+      height: 8px;
+      background-color: #e0e0e0;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    /* Progress indicator */
+    #progress {
+      height: 100%;
+      width: 0%;
+      background-color: #4cafef;
+      transition: width 0.3s ease;
+    }
+
+    /* Question styling */
+    .question {
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: normal;
+      /* removed bold */
+      margin: 20px 0 28px;
       color: #333;
     }
 
-    .score {
-      margin-bottom: 15px;
-      font-size: 16px;
-      color: #555;
+    /* LaTeX inside question */
+    .question mjx-container {
+      font-size: 1.3rem;
+      margin: 0 6px;
     }
 
-    .progress-bar {
-      width: 100%;
-      background: #e0e0e0;
-      border-radius: 10px;
-      overflow: hidden;
-      height: 12px;
-      margin-bottom: 20px;
+    /* Answer container */
+    .answers {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding: 0 8px;
     }
 
-    .progress {
-      height: 100%;
-      width: 0%;
-      background: #4caf50;
-      transition: width 0.3s;
-    }
-
-    .question {
-      font-size: 22px;
-      margin-bottom: 25px;
-      color: #222;
-      word-wrap: break-word;
-    }
-
+    /* Answer buttons */
     .answers button {
-      display: block;
-      width: 100%;
-      padding: 14px;
-      margin: 10px 0;
-      font-size: 18px;
-      border-radius: 10px;
-      border: none;
+      width: 95%;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 18px;
+      min-height: 65px;
+      font-size: 1.3rem;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 14px;
+      color: #333;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, box-shadow 0.2s, border-color 0.2s;
       cursor: pointer;
-      transition: 0.2s;
-      background: #e4e8eb;
     }
 
-    .answers button:hover {
-      background: #d0d4d8;
+    .answers button:hover:not(:disabled) {
+      background-color: #f0f0f0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    }
+    
+    /* --- NEW STYLES ADDED HERE --- */
+    .answers button.correct {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
     }
 
-    .correct {
-      background: #4caf50 !important;
-      color: white;
+    .answers button.wrong {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+    }
+    /* --- END OF NEW STYLES --- */
+
+    /* LaTeX inside answers */
+    .answers mjx-container {
+      font-size: 1.2rem;
     }
 
-    .wrong {
-      background: #f44336 !important;
-      color: white;
-    }
-
-    @media (max-width: 500px) {
-      .quiz-card {
-        padding: 20px;
-      }
-      h1 { font-size: 24px; }
-      .question { font-size: 20px; }
-      .answers button { font-size: 16px; padding: 12px; }
+    /* Prevent bottom space */
+    main {
+      padding-bottom: 40px;
     }
   </style>
 </head>
+
 <body>
-  <div class="quiz-card">
-    <h1>Unit Circle Quiz</h1>
-    <div class="score" id="score">Score: 0 / 0</div>
-    <div class="progress-bar">
-      <div class="progress" id="progress"></div>
+
+  <div class="quiz-container">
+    <div class="header">
+      <h1>Unit Circle Quiz</h1>
+      <div class="score" id="score">Score: 0 / 0</div>
+      <div class="progress-bar">
+        <div id="progress"></div>
+      </div>
+
     </div>
-    <div class="question" id="question"></div>
+    <div class="question-area">
+      <div class="question" id="question"></div>
+    </div>
     <div class="answers" id="answers">
       <button></button>
       <button></button>
@@ -115,103 +161,121 @@
 
   <script>
     const angles = [
-      { deg: 0, rad: "0" },
-      { deg: 30, rad: "π/6" },
-      { deg: 45, rad: "π/4" },
-      { deg: 60, rad: "π/3" },
-      { deg: 90, rad: "π/2" },
-      { deg: 120, rad: "2π/3" },
-      { deg: 135, rad: "3π/4" },
-      { deg: 150, rad: "5π/6" },
-      { deg: 180, rad: "π" },
-      { deg: 210, rad: "7π/6" },
-      { deg: 225, rad: "5π/4" },
-      { deg: 240, rad: "4π/3" },
-      { deg: 270, rad: "3π/2" },
-      { deg: 300, rad: "5π/3" },
-      { deg: 315, rad: "7π/4" },
-      { deg: 330, rad: "11π/6" },
-      { deg: 360, rad: "2π" }
+        { deg: 0, rad: "0" }, { deg: 30, rad: "\\frac{\\pi}{6}" }, { deg: 45, rad: "\\frac{\\pi}{4}" },
+        { deg: 60, rad: "\\frac{\\pi}{3}" }, { deg: 90, rad: "\\frac{\\pi}{2}" }, { deg: 120, rad: "\\frac{2\\pi}{3}" },
+        { deg: 135, rad: "\\frac{3\\pi}{4}" }, { deg: 150, rad: "\\frac{5\\pi}{6}" }, { deg: 180, rad: "\\pi" },
+        { deg: 210, rad: "\\frac{7\\pi}{6}" }, { deg: 225, rad: "\\frac{5\\pi}{4}" }, { deg: 240, rad: "\\frac{4\\pi}{3}" },
+        { deg: 270, rad: "\\frac{3\\pi}{2}" }, { deg: 300, rad: "\\frac{5\\pi}{3}" }, { deg: 315, rad: "\\frac{7\\pi}{4}" },
+        { deg: 330, rad: "\\frac{11\\pi}{6}" }, { deg: 360, rad: "2\\pi" }
     ];
 
     const trigValues = {
-      sin: { 0:"0",30:"1/2",45:"√2/2",60:"√3/2",90:"1",120:"√3/2",135:"√2/2",150:"1/2",180:"0",210:"-1/2",225:"-√2/2",240:"-√3/2",270:"-1",300:"-√3/2",315:"-√2/2",330:"-1/2",360:"0" },
-      cos: { 0:"1",30:"√3/2",45:"√2/2",60:"1/2",90:"0",120:"-1/2",135:"-√2/2",150:"-√3/2",180:"-1",210:"-√3/2",225:"-√2/2",240:"-1/2",270:"0",300:"1/2",315:"√2/2",330:"√3/2",360:"1" },
-      tan: { 0:"0",30:"√3/3",45:"1",60:"√3",90:"undefined",120:"-√3",135:"-1",150:"-√3/3",180:"0",210:"√3/3",225:"1",240:"√3",270:"undefined",300:"-√3",315:"-1",330:"-√3/3",360:"0" }
+      sin: {
+        0: "0", 30: "\\frac{1}{2}", 45: "\\frac{\\sqrt{2}}{2}", 60: "\\frac{\\sqrt{3}}{2}", 90: "1",
+        120: "\\frac{\\sqrt{3}}{2}", 135: "\\frac{\\sqrt{2}}{2}", 150: "\\frac{1}{2}", 180: "0",
+        210: "-\\frac{1}{2}", 225: "-\\frac{\\sqrt{2}}{2}", 240: "-\\frac{\\sqrt{3}}{2}", 270: "-1",
+        300: "-\\frac{\\sqrt{3}}{2}", 315: "-\\frac{\\sqrt{2}}{2}", 330: "-\\frac{1}{2}", 360: "0"
+      },
+      cos: {
+        0: "1", 30: "\\frac{\\sqrt{3}}{2}", 45: "\\frac{\\sqrt{2}}{2}", 60: "\\frac{1}{2}", 90: "0",
+        120: "-\\frac{1}{2}", 135: "-\\frac{\\sqrt{2}}{2}", 150: "-\\frac{\\sqrt{3}}{2}", 180: "-1",
+        210: "-\\frac{\\sqrt{3}}{2}", 225: "-\\frac{\\sqrt{2}}{2}", 240: "-\\frac{1}{2}", 270: "0",
+        300: "\\frac{1}{2}", 315: "\\frac{\\sqrt{2}}{2}", 330: "\\frac{\\sqrt{3}}{2}", 360: "1"
+      },
+      tan: {
+        0: "0", 30: "\\frac{\\sqrt{3}}{3}", 45: "1", 60: "\\sqrt{3}", 90: "undefined",
+        120: "-\\sqrt{3}", 135: "-1", 150: "-\\frac{\\sqrt{3}}{3}", 180: "0", 210: "\\frac{\\sqrt{3}}{3}",
+        225: "1", 240: "\\sqrt{3}", 270: "undefined", 300: "-\\sqrt{3}", 315: "-1", 330: "-\\frac{\\sqrt{3}}{3}", 360: "0"
+      }
     };
 
-    angles.forEach(a=>{
-      trigValues.csc = trigValues.csc||{};
-      trigValues.sec = trigValues.sec||{};
-      trigValues.cot = trigValues.cot||{};
+    angles.forEach(a => {
+      trigValues.csc = trigValues.csc || {};
+      trigValues.sec = trigValues.sec || {};
+      trigValues.cot = trigValues.cot || {};
       let s = trigValues.sin[a.deg], c = trigValues.cos[a.deg], t = trigValues.tan[a.deg];
-      trigValues.csc[a.deg] = (s==="0")?"undefined":recip(s);
-      trigValues.sec[a.deg] = (c==="0")?"undefined":recip(c);
-      trigValues.cot[a.deg] = (t==="0" || t==="undefined")?((t==="0")?"undefined":"0"):recip(t);
+      trigValues.csc[a.deg] = (s === "0") ? "undefined" : recip(s);
+      trigValues.sec[a.deg] = (c === "0") ? "undefined" : recip(c);
+      trigValues.cot[a.deg] = (t === "0" || t === "undefined") ? ((t === "0") ? "undefined" : "0") : recip(t);
     });
 
-    function recip(val){
-      const map = {"√2/2":"√2","-√2/2":"-√2","√3/2":"2√3/3","-√3/2":"-2√3/3","1/2":"2","-1/2":"-2","√3/3":"√3","-√3/3":"-√3","√3":"√3/3","-√3":"-√3/3","1":"1","-1":"-1","0":"undefined","undefined":"0"};
-      return map[val]||val;
+    function recip(val) {
+      const map = {
+        "\\frac{\\sqrt{2}}{2}": "\\sqrt{2}", "-\\frac{\\sqrt{2}}{2}": "-\\sqrt{2}",
+        "\\frac{\\sqrt{3}}{2}": "\\frac{2\\sqrt{3}}{3}", "-\\frac{\\sqrt{3}}{2}": "-\\frac{2\\sqrt{3}}{3}",
+        "\\frac{1}{2}": "2", "-\\frac{1}{2}": "-2", "\\frac{\\sqrt{3}}{3}": "\\sqrt{3}", "-\\frac{\\sqrt{3}}{3}": "-\\sqrt{3}",
+        "\\sqrt{3}": "\\frac{\\sqrt{3}}{3}", "-\\sqrt{3}": "-\\frac{\\sqrt{3}}{3}", "1": "1", "-1": "-1", "0": "undefined", "undefined": "0"
+      };
+      return map[val] || val;
     }
 
-    const functions = ["sin","cos","tan","csc","sec","cot"];
+    const functions = ["sin", "cos", "tan", "csc", "sec", "cot"];
     let questions = [];
-    functions.forEach(fn=>{
-      angles.forEach(a=>{
+    functions.forEach(fn => {
+      angles.forEach(a => {
         let correct = trigValues[fn][a.deg];
-        let label = Math.random()<0.5?`${fn}(${a.deg}°)`: `${fn}(${a.rad})`;
+        let label = Math.random() < 0.5 ? `${fn}(${a.deg}^\\circ)` : `${fn}(${a.rad})`;
         let choices = makeChoices(correct);
-        questions.push({question:`What is ${label}?`, answers:choices, correct:choices.indexOf(correct)});
+        questions.push({ question: `What is \\(${label}\\)?`, answers: choices, correct: choices.indexOf(correct) });
       });
     });
 
-    function makeChoices(correct){
-      const pool = ["0","1","-1","1/2","-1/2","√2/2","-√2/2","√3/2","-√3/2","√3/3","-√3/3","√3","-√3","2","-2","√2","-√2","2√3/3","-2√3/3","undefined"];
+    function makeChoices(correct) {
+      const pool = ["0", "1", "-1", "\\frac{1}{2}", "-\\frac{1}{2}", "\\frac{\\sqrt{2}}{2}", "-\\frac{\\sqrt{2}}{2}",
+        "\\frac{\\sqrt{3}}{2}", "-\\frac{\\sqrt{3}}{2}", "\\frac{\\sqrt{3}}{3}", "-\\frac{\\sqrt{3}}{3}",
+        "\\sqrt{3}", "-\\sqrt{3}", "2", "-2", "\\sqrt{2}", "-\\sqrt{2}", "\\frac{2\\sqrt{3}}{3}", "-\\frac{2\\sqrt{3}}{3}", "undefined"];
       let choices = [correct];
-      while(choices.length<4){
-        let pick = pool[Math.floor(Math.random()*pool.length)];
-        if(!choices.includes(pick)) choices.push(pick);
+      while (choices.length < 4) {
+        let pick = pool[Math.floor(Math.random() * pool.length)];
+        if (!choices.includes(pick)) choices.push(pick);
       }
       return shuffle(choices);
     }
 
-    function shuffle(arr){return arr.sort(()=>Math.random()-0.5);}
+    function shuffle(arr) { return arr.sort(() => Math.random() - 0.5); }
 
-    // Score and progress
     let score = 0, total = 0;
     let current;
 
-    function updateScore(){
+    function updateScore() {
       document.getElementById("score").innerText = `Score: ${score} / ${total}`;
-      const progressEl = document.getElementById("progress");
-      progressEl.style.width = total>0?`${(score/total)*100}%`:"0%";
+      document.getElementById("progress").style.width = total > 0 ? `${(score / total) * 100}%` : "0%";
     }
 
-    function nextQuestion(){
-      current = questions[Math.floor(Math.random()*questions.length)];
-      document.getElementById("question").innerText = current.question;
+    function nextQuestion() {
+      current = questions[Math.floor(Math.random() * questions.length)];
+      document.getElementById("question").innerHTML = current.question;
+
       const btns = document.querySelectorAll("#answers button");
-      btns.forEach((b,i)=>{
-        b.innerText = current.answers[i];
+      btns.forEach((b, i) => {
+        b.innerHTML = `\\(${current.answers[i]}\\)`;
         b.className = "";
         b.disabled = false;
-        b.onclick = ()=>{
+        b.onclick = () => {
           total++;
-          if(i===current.correct) score++;
+          if (i === current.correct) {
+            score++;
+            b.classList.add("correct");
+          } else {
+            b.classList.add("wrong");
+            btns[current.correct].classList.add("correct");
+          }
           updateScore();
-          if(i===current.correct) b.classList.add("correct");
-          else b.classList.add("wrong");
-          btns.forEach(btn=>btn.disabled=true);
-          setTimeout(nextQuestion,1000);
+          btns.forEach(btn => btn.disabled = true);
+          // --- SHORTENED DELAY HERE ---
+          setTimeout(nextQuestion, 750);
         };
       });
+
+      MathJax.typesetPromise();
     }
 
-    window.onload = ()=>{
+    window.onload = () => {
       updateScore();
       nextQuestion();
     };
   </script>
+
 </body>
+
 </html>
